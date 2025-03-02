@@ -1,0 +1,21 @@
+[project]
+name = "airflow-sandbox"
+version = "0.1.0"
+description = ""
+authors = [
+    { name = "Hotline Emu", email = "11667661+hotline-emu@users.noreply.github.com" },
+]
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+
+[tool.poetry.dependencies]
+apache-airflow = "^2.5.0"  # Change version based on your needs
+requests = "^2.26.0"
+
+[tool.poetry]
+packages = [{ include = "airflow_sandbox", from = "src" }]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
