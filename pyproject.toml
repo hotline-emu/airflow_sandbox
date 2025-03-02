@@ -9,7 +9,7 @@ readme = "README.md"
 requires-python = ">=3.12,<3.13"
 
 [tool.poetry.dependencies]
-apache-airflow = "^2.5.0"  # Change version based on your needs
+apache-airflow = {extras = ["sqlite"], version = "^2.10.5"}  # Change version based on your needs
 requests = "^2.26.0"
 
 [tool.poetry]

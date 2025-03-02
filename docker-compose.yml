@@ -1,0 +1,58 @@
+services:
+  # PostgreSQL Service
+  postgres:
+    image: postgres:13
+    container_name: postgres
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow_password
+      POSTGRES_DB: airflow_db
+    ports:
+      - "5432:5432" # Exposes PostgreSQL on localhost:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data # Persist data across container restarts
+    networks:
+      - airflow_network
+
+  # Airflow Webserver Service
+  airflow-webserver:
+    image: apache/airflow:2.6.1
+    container_name: airflow-webserver
+    environment:
+      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow_password@postgres:5432/airflow_db
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__WEBSERVER__SECRET_KEY=supersecretkey
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+    ports:
+      - "8080:8080" # Exposes the Airflow web UI on localhost:8080
+    volumes:
+      - airflow_dags:/opt/airflow/dags # Mount the dags directory
+    depends_on:
+      - postgres # Wait for PostgreSQL to be ready
+    networks:
+      - airflow_network
+    entrypoint: [ "bash", "-c", "airflow db init && airflow webserver" ]
+
+  # Airflow Scheduler Service
+  airflow-scheduler:
+    image: apache/airflow:2.6.1
+    container_name: airflow-scheduler
+    environment:
+      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow_password@postgres:5432/airflow_db
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+    volumes:
+      - airflow_dags:/opt/airflow/dags # Mount the dags directory
+    depends_on:
+      - postgres # Wait for PostgreSQL to be ready
+    networks:
+      - airflow_network
+    entrypoint: [ "bash", "-c", "airflow scheduler" ]
+
+volumes:
+  postgres_data: # Persist PostgreSQL data
+  airflow_dags:
+    # Store the DAGs
+
+networks:
+  airflow_network:
+    driver: bridge
